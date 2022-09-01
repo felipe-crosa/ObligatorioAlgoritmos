@@ -26,12 +26,20 @@ class HashCerrado {
     void agregar(string clave){
         if(esLleno) return;
         int valorString = hornerMethod(clave);
-        int clave = generarHash(valorString, this->largoArray);
-        
-        
+        int pos = generarHash(valorString, this->largoArray);
+        bool termino = false;
+        while(!termino){
+            if(this->array[pos] == NULL){
+                this->array[pos] = &clave;
+                this->cantidad++;
+                termino = true;
+            }else if(clave.compare(*(this->array[pos])) == 0){
+                termino = true;
+            }else{
+                pos = (pos+1)%this->largoArray;
+            }
+        }
     }
-
-    void borrar(string clave){}
 
     void destruir(){
     }
