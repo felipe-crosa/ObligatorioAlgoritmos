@@ -4,18 +4,17 @@
 using namespace std;
 
 int main() {
-    MinHeap * colaP = new MinHeap(20);
-    colaP->insertar(5);
-    colaP->insertar(867234);
-    colaP->insertar(27);
-    colaP->insertar(1891);
-    colaP->insertar(31);
-    colaP->insertar(19);
-    
+    int cantidad;
+    cin >> cantidad;
+    MinHeap * colaP = new MinHeap(cantidad);
+    while(cantidad-- > 0){
+        int elemento;
+        cin >> elemento;
+        colaP->insertar(elemento);
+    }
     while(!colaP->esVacio()){
         cout << colaP->obtenerMin() << endl;
         colaP->borrarMin();
     }
-
     return 0;
 };
