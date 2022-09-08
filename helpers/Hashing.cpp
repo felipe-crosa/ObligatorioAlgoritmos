@@ -3,7 +3,7 @@
 using namespace std;
 
 int hornerMethod(string palabra){
-    return 123;
+    //falta hacer
 }
 
 int generarHash(int valor, int largo){

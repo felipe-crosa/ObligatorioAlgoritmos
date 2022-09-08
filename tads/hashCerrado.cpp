@@ -55,4 +55,8 @@ class HashCerrado {
     bool esLleno() {
         return cantidad == largoArray;
     }
+
+    int cantidadElementos(){
+        return this->cantidad;
+    }
 };
