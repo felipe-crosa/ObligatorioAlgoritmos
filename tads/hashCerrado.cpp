@@ -23,6 +23,11 @@ class HashCerrado {
         this->cantidad = 0;
     }
 
+    ~HashCerrado(){
+        destruir();
+        delete[] array;
+    }
+
     void agregar(string clave){
         if(esLleno) return;
         int valorString = hornerMethod(clave);
@@ -42,6 +47,9 @@ class HashCerrado {
     }
 
     void destruir(){
+        for(int i=0; i<this->largoArray; i++){
+            delete this->array[i]; 
+        }
     }
 
     bool esLleno() {
