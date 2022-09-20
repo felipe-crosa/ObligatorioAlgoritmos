@@ -1,11 +1,6 @@
 #include <iostream>
 using namespace std;
 
-int proximoPrimo(int numero){
-    while(!esPrimo(++numero));
-    return numero;
-}
-
 
 bool esPrimo(int num){
     if(num < 2 || (num%2==0 && num>2)) return false;
@@ -16,4 +11,9 @@ bool esPrimo(int num){
         }
     }
     return true;
+}
+
+int proximoPrimo(int numero){
+    while(!esPrimo(++numero));
+    return numero;
 }

@@ -7,11 +7,13 @@ int main() {
     int num;
     cin >> num;
     HashCerrado* hash = new HashCerrado(num);
+
     while(num-- > 0){
         string linea;
         cin >> linea;
         hash->agregar(linea);
     }
-    cout << hash->cantidadElementos();
+    cout << hash->cantidadElementos() << endl;
+    delete hash;
     return 0;
 }

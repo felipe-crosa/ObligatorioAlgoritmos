@@ -13,6 +13,19 @@ class HashCerrado {
     int cantidad;
     int largoArray;
 
+    bool insertar (int pos, string clave) {
+        bool retorno = false;
+        if(array[pos] == NULL){
+            array[pos] = new string(clave);
+            cantidad++;
+            retorno = true;
+        }        
+        else if(clave.compare(*array[pos]) == 0) {
+            retorno = true;
+        }
+        return retorno;
+    }
+
    public:
     HashCerrado(int cantidad){
         this->largoArray = proximoPrimo(cantidad*2);
@@ -24,31 +37,17 @@ class HashCerrado {
     }
 
     ~HashCerrado(){
-        destruir();
         delete[] array;
     }
 
     void agregar(string clave){
-        if(esLleno) return;
+        if(esLleno()) return;
         int valorString = hornerMethod(clave);
-        int pos = generarHash(valorString, this->largoArray);
+        int valorHash = generarHash(valorString, this->largoArray);
         bool termino = false;
-        while(!termino){
-            if(this->array[pos] == NULL){
-                this->array[pos] = &clave;
-                this->cantidad++;
-                termino = true;
-            }else if(clave.compare(*(this->array[pos])) == 0){
-                termino = true;
-            }else{
-                pos = (pos+1)%this->largoArray;
-            }
-        }
-    }
-
-    void destruir(){
-        for(int i=0; i<this->largoArray; i++){
-            delete this->array[i]; 
+        for(int i = 0; !termino; i++){
+            int pos = (valorHash + (i*i)) % largoArray;
+            termino = insertar(pos, clave);
         }
     }
 
