@@ -1,20 +1,22 @@
 #include <iostream>
-#include "tads/minHeap.cpp"
+#include "tads/heap/heap.cpp"
 
 using namespace std;
 
 int main() {
     int cantidad;
     cin >> cantidad;
-    MinHeap * colaP = new MinHeap(cantidad);
+    Heap<int> * colaP = new Heap<int>(cantidad);
+
     while(cantidad-- > 0){
         int elemento;
         cin >> elemento;
-        colaP->insertar(elemento);
+        colaP->insertar(elemento, elemento);
     }
+
     while(!colaP->esVacio()){
-        cout << colaP->obtenerMin() << endl;
-        colaP->borrarMin();
+        cout << colaP->obtenerProximo() << endl;
+        colaP->borrarProximo();
     }
     return 0;
 };
