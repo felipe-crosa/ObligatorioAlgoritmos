@@ -1,7 +1,7 @@
 #include <iostream>
 using namespace std;
 #include <string>
-#include "tads/hashCerrado.cpp"
+#include "tads/hash/hashCerrado.cpp"
 
 int main() {
     int num;

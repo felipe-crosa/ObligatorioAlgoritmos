@@ -1,8 +1,8 @@
 #include <iostream>
 using namespace std;
 #include <string>
-#include "../helpers/NumeroPrimos.cpp"
-#include "../helpers/Hashing.cpp"
+#include "../../helpers/NumeroPrimos.cpp"
+#include "../../helpers/Hashing.cpp"
 
 
 

@@ -1,16 +1,29 @@
+#pragma once
 #include <iostream>
 #include "../lista/lista.cpp"
 #include "../../helpers/arrays.cpp"
+#include "../heap/heap.cpp"
+#include "../../helpers/Numeros.cpp"
 using namespace std;
 
 class Arista {
     public:
         int costo;
-        bool existe;
+        int origen;
+        int destino;
 
-        Arista(int costo): costo(costo), existe(true){};
-        Arista(): costo(0), existe(false){};
+        Arista( int origen, int destino, int costo = 1): origen(origen), costo(costo), destino(destino){};
+
+        Arista* clon() {
+            return new Arista(origen, destino, costo);
+        }
 };
+
+bool criterioComparaAristasPrim (Arista* a1, Arista* a2) {
+    return (a1->origen != a2->origen) 
+        ? a1->origen < a2->origen 
+        : a1->destino < a2->destino;
+}
 
 class Grafo {
     private:
@@ -18,56 +31,35 @@ class Grafo {
         int tope;
         int cantVertices;
         int** vertices;
-        Arista* ** matAdy;
-        Lista<int> * listaHuecos;
 
-        int posVertice(int vert){
-            for (int i = 0; i < tope; i++) {
-                if(this->vertices[i] != NULL && *this->vertices[i] == vert) {
-                    return i;
-                }
-            }
-            return -1;
-        }
-
-        void DFSRec(int pos, bool * vis){
-            cout << *this->vertices[pos] << endl;
-            vis[pos] = true;
-            for(int j=0; j<tope; j++){
-                if(!vis[j] && this->matAdy[pos][j]->existe){
-                    DFSRec(j, vis);
-                }
+        void agregarAdyacenciasHeap (int vertice, Heap<Arista*>* heap, bool* vis) {
+            IteradorLista<Arista*>* iter = adyacencias[vertice]->obtenerIterador();
+            while(iter->hayElemento()){
+                Arista* elemento = iter->obtenerElemento();
+                if(!vis[elemento->destino]){
+                    heap->insertar(elemento, elemento->costo);
+                } 
+                iter->avanzar();
             }
         }
+        
+
 
     public:
-        Grafo(int tope, bool esDirigido){
+        Lista<Arista*> ** adyacencias;
+        Lista<int> * listaHuecos;
+        Grafo(int tope, bool esDirigido = false){
             this->tope = tope;
             this->esDirigido = esDirigido;
-            this->cantVertices = 0;
-            this->vertices = new int*[tope];
-            for(int i=0; i<tope; vertices[i++] = NULL);
+            cantVertices = 0;
+            vertices = new int*[this->tope + 1];
+            adyacencias = new Lista<Arista*>*[tope + 1];
+            listaHuecos = new Lista<int>();
 
-            this->matAdy = new Arista**[tope];
-            for(int i=0; i<tope; i++){
-                this->matAdy[i] = new Arista*[tope];
-                if(esDirigido){
-                    for(int j=0; j<tope; j++){
-                        this->matAdy[i][j] = new Arista();
-                    }
-                }else{
-                    for(int j=i+1; j<tope; j++){
-                        this->matAdy[i][j] = this->matAdy[j][i] = new Arista();
-                    }
-                }
-            }
-            for(int k=0; k<tope; k++){
-                this->matAdy[k][k] = new Arista();
-            }
-
-            this->listaHuecos = new Lista<int>();
-            for(int k=0; k<tope; k++){
-                this->listaHuecos->insertarFin(k);
+            for(int i=1; i<=tope; i++){
+                 vertices[i] = NULL;
+                 adyacencias[i] = new Lista<Arista*>();
+                 listaHuecos->insertarFin(i);
             }
         }
 
@@ -79,152 +71,95 @@ class Grafo {
             this->cantVertices++;
         }
 
-        void insertarArista(int origen, int destino, int costo){
-            int posOrigen = posVertice(origen);
-            int posDestino = posVertice(destino);
-            
-            Arista * arista = this->matAdy[posOrigen][posDestino];
-            arista->costo=costo;
-            arista->existe=true;
-        }
-
-        void ordenTopologico(){
-
-            Lista<int>* bolsaCeros = new Lista<int>();        
-            // Calculo vector de grados de incidencia de los vértices
-            int* gradosIncidencia = new int[tope];
-            for(int k=0; k<tope; k++){
-                gradosIncidencia[k] = 0;
-            }
-            for(int j=0; j<tope; j++){
-                if(vertices[j] == NULL){
-                    continue;
-                }
-                for(int i=0; i<tope; i++){
-                    if(this->matAdy[i][j]->existe){
-                        gradosIncidencia[j]++;
-                    }
-                }
-                if(gradosIncidencia[j]==0){
-                    bolsaCeros->insertarFin(j);
-                }
-            }
-            for(int k=0; k<cantVertices; k++){
-                if(bolsaCeros->esVacia()){
-                    cout << "CICLOOOOOO!" << endl;
-                    return;
-                }
-                int vert = bolsaCeros->obtenerPpio();
-                bolsaCeros->borrarPpio();
-                cout << *this->vertices[vert] << endl;
-                for(int j=0; j<tope; j++){
-                    if(this->matAdy[vert][j]->existe){
-                        gradosIncidencia[j]--;
-                        if(gradosIncidencia[j]==0){
-                            bolsaCeros->insertarFin(j);
-                        }
-                    }
-                }
+        void insertarArista(int origen, int destino, int costo = 1){
+            Arista* arista = new Arista(origen, destino, costo);
+            adyacencias[origen]->insertarPpio(arista);
+            if(!esDirigido){
+                Arista* arista = new Arista(destino, origen, costo);
+                adyacencias[destino]->insertarPpio(arista);
             }
         }
 
-        // Depth-First Search
-        void DFS(int origen){
-            int posOrigen = posVertice(origen);
-            bool * vis = new bool[tope];
-            for(int i=0; i<tope; vis[i++] = false);
-            DFSRec(posOrigen, vis);
+        Heap<Arista*>* prim (int* verticesDescartar, int cantidadDescartar ){
+            int cantidadMaximaAristas = (cantVertices*(cantVertices-1))/2;
+            Heap<Arista*> * retorno = new Heap<Arista*>(cantidadMaximaAristas, true, criterioComparaAristasPrim);
+
+            bool* estanDescartados = new bool[tope+1];
+            for(int i=0 ; i<=tope; estanDescartados[i++] = false);
+            for(int j=0 ; j<cantidadDescartar; j++ ){
+                estanDescartados[verticesDescartar[j]] = true;
+            }
+
+            Heap<Arista*> * minHeap = new Heap<Arista*>(cantidadMaximaAristas);
+
+            int vertice=1;
+            while(vertice <= cantVertices){
+                if(!estanDescartados[vertice]) break;
+                vertice++;
+            }
+            estanDescartados[vertice] = true;
+
+            this->agregarAdyacenciasHeap(vertice, minHeap, estanDescartados);    
+            int cantidadAgregadas = 0;
+            while( cantidadAgregadas < (cantVertices-cantidadDescartar-1) && !minHeap->esVacio() ){
+                Arista* proximaArista = minHeap->obtenerProximo();
+                int destino = proximaArista->destino;
+                int origen = proximaArista->origen;
+                int costo = proximaArista->costo;
+
+                minHeap->borrarProximo();
+
+                if(!estanDescartados[destino]) {
+                    estanDescartados[destino] = true;
+                    retorno->insertar(new Arista(min(destino, origen), max(destino, origen), costo), min(destino, origen));
+                    cantidadAgregadas++;
+                    this->agregarAdyacenciasHeap(destino, minHeap, estanDescartados);
+                }
+                
+            }
+            return retorno;
         }
 
-        // Breadth-First Search
-        void BFS(int origen){
-            int posOrigen = posVertice(origen);
-            bool * vis = new bool[tope];
-            for(int i=0; i<tope; vis[i++] = false);
-            Lista<int> * cola = new Lista<int>();
-            cola->insertarFin(posOrigen);
-            while(!cola->esVacia()){
-                int pos = cola->obtenerPpio();
-                cola->borrarPpio();
-                cout <<*this->vertices[pos] << endl;
-                vis[pos] = true;
-                for(int j=0; j<tope; j++){
-                    if(!vis[j] && this->matAdy[pos][j]->existe){
-                        cola->insertarFin(j);
-                    }
-                }
+        void dfs (int vertice , bool* vis){
+            vis[vertice] = true;
+            IteradorLista<Arista*>* ady = adyacencias[vertice]->obtenerIterador();
+            while(ady->hayElemento()){
+                Arista* arista = ady->obtenerElemento();
+                if(!vis[arista->destino]) dfs(arista->destino, vis);
+                ady->avanzar();
             }
         }
 
+        bool esConexoSinDosVertices (int vertice1, int vertice2) {
+            bool* vis = new bool[tope+1];
+            for(int i=1; i<=tope ; vis[i++] = false);
+            vis[vertice1] = true;
+            vis[vertice2] = true;
+
+            int vertice = 1;
+            while(vertice <= cantVertices){
+                if(!vis[vertice]) break;
+                vertice++;
+            }
+
+            dfs(vertice, vis);
+            int retorno = true;
+            for(int i=1; i<=cantVertices && retorno; i++){
+                retorno = retorno && vis[i];
+            }
+            delete [] vis;
+            return retorno;
+        }
+
+        bool esTriconexo() {
+            bool retorno = true;
+            for(int i=1; i < cantVertices; i++){
+                for(int j=i+1; j <= cantVertices; j++){
+                    retorno = retorno && esConexoSinDosVertices(i,j);
+                    if(!retorno) return retorno;
+                }
+            }
+            return retorno;
+        }
 };
 
-void pruebaOrdenTopologico() {
-    Grafo * g = new Grafo(10, true);
-    g->insertarVertice(1);
-    g->insertarVertice(2);
-    g->insertarVertice(3);
-    g->insertarVertice(4);
-    g->insertarVertice(5);
-    g->insertarVertice(6);
-    g->insertarVertice(7);
-
-    g->insertarArista(1,2,1);
-    g->insertarArista(1,3,1);
-    g->insertarArista(1,4,1);
-    g->insertarArista(2,4,1);
-    g->insertarArista(2,5,1);
-    g->insertarArista(3,6,1);
-    g->insertarArista(4,3,1);
-    g->insertarArista(4,6,1);
-    g->insertarArista(4,7,1);
-    g->insertarArista(5,4,1);
-    g->insertarArista(5,7,1);
-    g->insertarArista(7,6,1);
-
-    g->ordenTopologico();
-}
-
-void pruebaBFS(){
-Grafo * g = new Grafo(17, true);
-    g->insertarVertice(1);
-    g->insertarVertice(2);
-    g->insertarVertice(3);
-    g->insertarVertice(4);
-    g->insertarVertice(5);
-    g->insertarVertice(6);
-    g->insertarVertice(7);
-    g->insertarVertice(8);
-    g->insertarVertice(9);
-    g->insertarVertice(10);
-    g->insertarVertice(11);
-    g->insertarVertice(12);
-    g->insertarVertice(13);
-    g->insertarVertice(14);
-    g->insertarVertice(15);
-    g->insertarVertice(16);
-    g->insertarVertice(17);
-
-    g->insertarArista(1,2,1);
-    g->insertarArista(1,3,1);
-    g->insertarArista(1,4,1);
-    g->insertarArista(1,5,1);
-    g->insertarArista(2,6,1);
-    g->insertarArista(2,7,1);
-    g->insertarArista(2,8,1);
-    g->insertarArista(3,9,1);
-    g->insertarArista(3,10,1);
-    g->insertarArista(3,11,1);
-    g->insertarArista(4,12,1);
-    g->insertarArista(4,13,1);
-    g->insertarArista(4,14,1);
-    g->insertarArista(5,15,1);
-    g->insertarArista(5,16,1);
-    g->insertarArista(5,17,1);
-
-    g->BFS(1);
-}
-
-int main() {
-    pruebaBFS();
-    return 0;
-}
