@@ -4,19 +4,12 @@
 using namespace std;
 #define INF 99999
 
-void SubconjuntoSumaM(int& solOptima, int solActual, int* elementos, int& cantElementos,
-            int M, int pos){
-    
-    if(M == 0){
-        if(solActual < solOptima || solOptima == INF){
-            solOptima = solActual;
-        }
-    }
-    else if (M > 0 && pos < cantElementos){
-        SubconjuntoSumaM(solOptima, solActual+1, elementos, cantElementos, M-elementos[pos], pos);
-        int vecesPosible = M/elementos[pos];
+void SubconjuntoSumaM(int& solOptima, int solActual, int* elementos, int& cantElementos, int valorObjetivo, int pos){
+    if(valorObjetivo == 0 && (solActual < solOptima)) solOptima = solActual;
+    else if (valorObjetivo > 0 && pos < cantElementos && solActual < solOptima){
+        int vecesPosible = valorObjetivo/elementos[pos];
         for(int i=0; i<=vecesPosible; i++){
-           SubconjuntoSumaM(solOptima, solActual+i, elementos, cantElementos, M-i*elementos[pos], pos+1);
+           SubconjuntoSumaM(solOptima, solActual+i, elementos, cantElementos, valorObjetivo-i*elementos[pos], pos+1);
         }
     }
 }
@@ -43,13 +36,8 @@ int main(){
         solOptima = INF;
         int M = casosPrueba[i];
         SubconjuntoSumaM(solOptima, solActual, elementos, cantElementos, M, pos);
-
-        if(solOptima == INF){
-            cout << "0" << endl;
-        }
-        else{
-            cout << solOptima << endl;
-        }
+        if(solOptima == INF) cout << "0" << endl;
+        else cout << solOptima << endl;
     }
     return 0;
 }
