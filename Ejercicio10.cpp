@@ -5,12 +5,9 @@ using namespace std;
 
 
 bool compararAux(string c1, string c2, int i){
-    if(c2[i] == '\0' || c1[i] > c2[i]) return true;
-    if(c1[i] == '\0' || c1[i] < c2[i]) return false;
-    
-    else{
-        return compararAux(c1, c2, i+1);
-    }
+    if((c1[i] == '\0' && c1[0]>=c2[i]) || c1[i] > c2[i]) return true;
+    if((c2[i] == '\0' && c2[0]>=c1[i]) || c1[i] < c2[i]) return false;
+    return compararAux(c1, c2, i+1);
 }
 
 
