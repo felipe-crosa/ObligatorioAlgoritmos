@@ -18,5 +18,6 @@ int main() {
         cout << colaP->obtenerProximo() << endl;
         colaP->borrarProximo();
     }
+    delete colaP;
     return 0;
 };

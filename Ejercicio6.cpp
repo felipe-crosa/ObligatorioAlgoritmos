@@ -36,6 +36,6 @@ int main(){
     }
 
     cout << NumeroSinPareja(elementos, 0, cantElementos-1) << endl;
-
+    delete [] elementos;
     return 0;
 }

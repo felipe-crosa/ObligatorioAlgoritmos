@@ -43,6 +43,6 @@ int main(){
     }
 
     cout << MaximoNumero(maxHeap, cantElementos) << endl;
-
+    delete maxHeap;
     return 0;
 }
