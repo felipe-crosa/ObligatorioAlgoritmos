@@ -62,6 +62,9 @@ class Grafo {
                  listaHuecos->insertarFin(i);
             }
         }
+        ~Grafo() {
+            delete [] vertices;
+        }
 
         void insertarVertice(int vert){
             int hueco = this->listaHuecos->obtenerPpio();

@@ -51,5 +51,10 @@ int main(){
         cout << ((valor==INF) ? 0 : 1) << endl;
     }
 
+    delete [] elementos;
+    delete [] casosPrueba;
+    for(int i = 0 ; i < cantElementos; i++) {
+        delete [] matDP[i];
+    }
     return 0;
 }

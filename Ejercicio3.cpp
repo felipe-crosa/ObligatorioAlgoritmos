@@ -11,13 +11,6 @@ using namespace std;
 
 int main () {
 
-   // string inFile;
-   // cin >> inFile;
-   // ifstream myFile(inFile);
-   // cin.rdbuf(myFile.rdbuf());
-   // ofstream myFile2 ("res.txt");
-   // cout.rdbuf(myFile2.rdbuf());      
-   
    Grafo* grafo = generarGrafo(true, true);
 
    int cantidadIngorados;
@@ -34,6 +27,9 @@ int main () {
       cout << elemento->origen << " " << elemento->destino << " " << elemento->costo << endl;
       arbolMinimoCubrimiento->borrarProximo();
    }
-   
+
+   delete arbolMinimoCubrimiento;
+   delete [] ignorados;
+
    return 0;
 }

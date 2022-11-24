@@ -39,5 +39,9 @@ int main(){
         if(solOptima == INF) cout << "0" << endl;
         else cout << solOptima << endl;
     }
+
+    delete [] elementos;
+    delete [] casosPrueba;
+    
     return 0;
 }

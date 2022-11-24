@@ -5,15 +5,9 @@
 #include "helpers/LeerDatos.cpp"
 using namespace std;
 
-int main () {
-   // string inFile;
-   // cin >> inFile;
-   // ifstream myFile(inFile);
-   // cin.rdbuf(myFile.rdbuf());
-   // ofstream myFile2 ("res.txt");
-   // cout.rdbuf(myFile2.rdbuf());   
-   
+int main () {   
    Grafo* grafo = generarGrafo();
-   cout << ((grafo->esTriconexo()) ? 1 : 0);
+   cout << ((grafo->esTriconexo()) ? 1 : 0) << endl;
+   delete grafo;
    return 0;
 }

@@ -32,13 +32,6 @@ bool compararNodos (NodoIncidencia* nodo1 , NodoIncidencia* nodo2) {
 
 
 int main() {
-    // string inFile;
-    // cin >> inFile;
-    // ifstream myFile(inFile);
-    // cin.rdbuf(myFile.rdbuf());
-    // ofstream myFile2 ("res.txt");
-    // cout.rdbuf(myFile2.rdbuf());   
-
     int cantidadVertices, cantidadAristas;
     cin >> cantidadVertices;
     NodoIncidencia** incidencias = new NodoIncidencia*[cantidadVertices + 1];
@@ -63,6 +56,8 @@ int main() {
         cout << proximo->getVertice() << " " << proximo->getCantidad() << endl;
         maxHeap->borrarProximo();
     }
+
+    delete [] incidencias;
 
     return 0;
 }
